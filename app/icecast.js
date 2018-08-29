@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 
 class Icecast {
     constructor(path) {
-        this.path = path;
+        this.path = '/etc/icecast2/icecast.xml';
         this.parseXml(path);
     }
 
@@ -34,11 +34,17 @@ class Icecast {
         });
     }
 
+    // Buscar un punto de montajes por su key
     find(key) {
         var obj = this.data;
+        var mount = obj.icecast.mount[key];
+        if (typeof mount === "undefined") {
+            return;
+        }
         return JSON.stringify(obj.icecast.mount[key]);
     }
 
+    // Agregar un punto de montaje
     add(mount) {
         var obj = this.data;
         var key = 0;
