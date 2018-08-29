@@ -5,8 +5,7 @@ const { exec } = require('child_process');
 
 class Icecast {
     constructor() {
-        // this.path = '/etc/icecast2/icecast.xml';
-        this.path = './icecast.xml';
+        this.path = '/etc/icecast2/icecast.xml';
         this.parseXml();
     }
 
@@ -35,6 +34,20 @@ class Icecast {
         });
     }
 
+    updateXml(obj) {
+        // Crear un nuevo objeto constructor y luego convertir
+        // nuestro json vuelve a xml.
+        var builder = new xml2js.Builder();
+        var xml = builder.buildObject(obj);
+        
+        fs.writeFile(this.path, xml, 'utf8', (err) => {
+            if (err) throw err;
+            // Ejectuamos el comando reload de icecast2 para cargar 
+            // el xml con el nuevo nuevo punto de montaje.
+            exec('/etc/init.d/icecast2 reload');
+        });
+    }
+
     // Buscar un punto de montajes por su key
     find(key) {
         var obj = this.data;
@@ -57,20 +70,27 @@ class Icecast {
         } else {
             obj.icecast.mount = mount;
         }
-        
-        // Crear un nuevo objeto constructor y luego convertir
-        // nuestro json vuelve a xml.
-        var builder = new xml2js.Builder();
-        var xml = builder.buildObject(obj);
-        
-        fs.writeFile(this.path, xml, 'utf8', (err) => {
-            if (err) throw err;
-            // Ejectuamos el comando reload de icecast2 para cargar 
-            // el xml con el nuevo nuevo punto de montaje.
-            exec('/etc/init.d/icecast2 reload');
-        });
-        
-        return key; 
+
+        // Actualizamos el xml con la nueva configuración
+        this.updateXml(obj);
+
+        return key;
+    }
+
+    /**
+     * Eliminar un punto de montaje. 
+     */
+    delete(key) {
+        // Obtenemos el obejcto con toda la configuración
+        var obj = this.data;
+
+        // Eliminamos el punto de montaje
+        delete obj.icecast.mount[key];
+
+        // Guardamos los cambios
+        this.updateXml(obj);
+
+        return typeof obj.icecast.mount[key] == "undefined";
     }
 }
 
