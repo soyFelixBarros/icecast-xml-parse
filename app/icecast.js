@@ -4,9 +4,9 @@ var xml2js = require('xml2js');
 const { exec } = require('child_process');
 
 class Icecast {
-    constructor(path) {
+    constructor() {
         this.path = '/etc/icecast2/icecast.xml';
-        this.parseXml(path);
+        this.parseXml();
     }
 
     get path() {
@@ -26,8 +26,8 @@ class Icecast {
     }
 
     // Parseamos el xml y guardamos la info como un objecto
-    parseXml(path) {
-        var xml = fs.readFileSync(path, 'utf-8');
+    parseXml() {
+        var xml = fs.readFileSync(this.path, 'utf-8');
 
         parseString(xml, (err, result) => {
             this.data = result;
