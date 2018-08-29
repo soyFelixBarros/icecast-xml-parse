@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 class Icecast {
     constructor() {
         this.path = '/etc/icecast2/icecast.xml';
+        // this.path = './icecast.xml';
         this.parseXml();
     }
 
@@ -23,6 +24,12 @@ class Icecast {
 
     set data(value) {
         this._data  = value;
+    }
+
+    mounts() {
+        return this.data.icecast.mount.map(function(element) {
+           return element['mount-name'];
+        });
     }
 
     // Parseamos el xml y guardamos la info como un objecto
@@ -49,12 +56,13 @@ class Icecast {
     }
 
     // Buscar un punto de montajes por su key
-    find(key) {
+    find(hash) {
         var obj = this.data;
-        var mount = obj.icecast.mount[key];
-        if (typeof mount == "undefined") {
-            return;
-        }
+        
+        var mount = obj.icecast.mount.find(function(element) {
+            if (hash == element['hash']) return element;
+        });
+
         return JSON.stringify(mount);
     }
 
@@ -74,23 +82,23 @@ class Icecast {
         // Actualizamos el xml con la nueva configuración
         this.updateXml(obj);
 
-        return key;
+        return this.find(mount.hash);
     }
 
     /**
      * Eliminar un punto de montaje. 
      */
-    delete(key) {
+    delete(hash) {
         // Obtenemos el obejcto con toda la configuración
         var obj = this.data;
 
-        // Eliminamos el punto de montaje
-        delete obj.icecast.mount[key];
-
+        // Recorremos los muntos de montajes, y eliminamos el 
+        // que tenga el hash paso como parametro.
+        obj.icecast.mount.forEach(function(element, index) {
+            if (hash == element['hash']) delete obj.icecast.mount[index];
+        });
         // Guardamos los cambios
         this.updateXml(obj);
-
-        return typeof obj.icecast.mount[key] == "undefined";
     }
 }
 

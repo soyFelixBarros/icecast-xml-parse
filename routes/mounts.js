@@ -4,14 +4,16 @@ var Icecast = require('../app/icecast');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('mounts');
+  var icecast = new Icecast;
+  var mounts = icecast.mounts();
+  res.status(200).json({ mounts: JSON.stringify(mounts) });
 });
 
 // POST mounts
 router.post('/', function (req, res) {
   var icecast = new Icecast;
-  var key = icecast.add(req.body);
-  res.status(201).json({ key: key });
+  var mount = icecast.add(req.body);
+  res.status(201).json({ data: mount });
 });
 
 // // PUT mounts
@@ -22,17 +24,17 @@ router.post('/', function (req, res) {
 // });
 
 /* GET mounts */
-router.get('/:id', function(req, res, next) {
+router.get('/:hash', function(req, res, next) {
   var icecast = new Icecast;
-  var mount = icecast.find(req.params.id);
+  var mount = icecast.find(req.params.hash);
   res.status(200).json(mount);
 });
 
 /* DELETE mounts */
-router.delete('/:id', function(req, res, next) {
+router.delete('/:hash', function(req, res, next) {
   var icecast = new Icecast;
-  var deleted = icecast.delete(req.params.id);
-  res.status(204).json({ deleted: deleted });
+  var deleted = icecast.delete(req.params.hash);
+  res.status(204).json({});
 });
 
 
