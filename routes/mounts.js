@@ -24,16 +24,16 @@ router.post('/', function (req, res) {
 // });
 
 /* GET mounts */
-router.get('/:hash', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
   var icecast = new Icecast;
-  var mount = icecast.find(req.params.hash);
+  var mount = icecast.find(req.params.id);
   res.status(200).json(mount);
 });
 
 /* DELETE mounts */
-router.delete('/:hash', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
   var icecast = new Icecast;
-  var deleted = icecast.delete(req.params.hash);
+  icecast.delete(req.params.id);
   res.status(204).json({});
 });
 

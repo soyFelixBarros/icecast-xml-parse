@@ -56,11 +56,11 @@ class Icecast {
     }
 
     // Buscar un punto de montajes por su key
-    find(hash) {
+    find(id) {
         var obj = this.data;
         
         var mount = obj.icecast.mount.find(function(element) {
-            if (hash == element['hash']) return element;
+            if (id == element['id']) return element;
         });
 
         return JSON.stringify(mount);
@@ -82,20 +82,20 @@ class Icecast {
         // Actualizamos el xml con la nueva configuración
         this.updateXml(obj);
 
-        return this.find(mount.hash);
+        return this.find(mount.id);
     }
 
     /**
      * Eliminar un punto de montaje. 
      */
-    delete(hash) {
+    delete(id) {
         // Obtenemos el obejcto con toda la configuración
         var obj = this.data;
 
         // Recorremos los muntos de montajes, y eliminamos el 
-        // que tenga el hash paso como parametro.
+        // que tenga el ID pasado como parametro.
         obj.icecast.mount.forEach(function(element, index) {
-            if (hash == element['hash']) delete obj.icecast.mount[index];
+            if (id == element['id']) delete obj.icecast.mount[index];
         });
         // Guardamos los cambios
         this.updateXml(obj);
